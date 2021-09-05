@@ -69,10 +69,17 @@ contract LidoAdapter is IAdapter {
     // This is the slippage percentage (in basis points) we can tolerate when selling stETH into the ETH/stETH curve pool
     uint256 public _maxSlippage = 100;
 
+    // This is a burn address 
+    address public burnAddress = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+
+
+    // NOTE: The "LP Token" in this case are "shares". This is an internal bookkeeping mechanism that Lido uses
+    // to determine how much ETH a user is eligible to withdraw
+    // The "underlying token" is ETH, which does not have an address 
+
     /**
      * @inheritdoc IAdapter
      */
-     // DONE
     function getDepositAllCodes(
         address payable _vault,
         address[] memory _underlyingTokens,
@@ -99,14 +106,15 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-    function getUnderlyingTokens(address _liquidityPool, address)
+     // "Underlying" token is ETH which has no address, so we return the burn address
+    function getUnderlyingTokens(address, address)
         public
         view
         override
         returns (address[] memory _underlyingTokens)
     {
         _underlyingTokens = new address[](1);
-        _underlyingTokens[0] = IHarvestDeposit(_liquidityPool).underlying();
+        _underlyingTokens[0] = burnAddress;
     }
 
     /**
@@ -114,33 +122,31 @@ contract LidoAdapter is IAdapter {
      */
     function calculateAmountInLPToken(
         address,
-        address _liquidityPool,
-        uint256 _depositAmount
+        address,
+        uint256 _underlyingTokenAmount
     ) public view override returns (uint256) {
-        return
-            _depositAmount.mul(10**IHarvestDeposit(_liquidityPool).decimals()).div(
-                IHarvestDeposit(_liquidityPool).getPricePerFullShare()
-            );
+        return IStETH(lidoAndStETHAddress).getSharesByPooledEth(_underlyingTokenAmount);
     }
 
     /**
      * @inheritdoc IAdapter
      */
     function calculateRedeemableLPTokenAmount(
-        address payable _vault,
-        address _underlyingToken,
-        address _liquidityPool,
+        address payable,
+        address,
+        address,
         uint256 _redeemAmount
-    ) public view override returns (uint256 _amount) {
-        uint256 _liquidityPoolTokenBalance = getLiquidityPoolTokenBalance(_vault, _underlyingToken, _liquidityPool);
-        uint256 _balanceInToken = getAllAmountInToken(_vault, _underlyingToken, _liquidityPool);
-        // can have unintentional rounding errors
-        _amount = (_liquidityPoolTokenBalance.mul(_redeemAmount)).div(_balanceInToken).add(1);
+    ) public view override returns (uint256) {
+        // There is no concept of redeemable LP tokens
+        // Rewards are automatically added to a users balance (no need to redeem)
+        // So let's just calculate the amount of ETH corresponds to _redeemAmount of shares
+        return IStETH(lidoAndStETHAddress).getPooledEthByShares(_redeemAmount);
     }
 
     /**
      * @inheritdoc IAdapter
      */
+     // DONE
     function isRedeemableAmountSufficient(
         address payable _vault,
         address _underlyingToken,
@@ -155,7 +161,8 @@ contract LidoAdapter is IAdapter {
      * @inheritdoc IAdapter
      */
     function canStake(address) public view override returns (bool) {
-        return true;
+        // You can't stake stETH into the Lido Protocol
+        return false;
     }
 
     /**
@@ -170,11 +177,7 @@ contract LidoAdapter is IAdapter {
     ) public view override returns (bytes[] memory _codes) {
         if (_amounts[0] > 0) {
             _codes = new bytes[](1);
-
-            // The address argument is a referral address.
-            // There is no amount parameter; the amount to deposit must be specified 
-            // as the value of the message (msg.value).
-            _codes[0] = abi.encode(lidoAndStETHAddress, abi.encodeWithSignature("submit(address)", lidoReferralAddress));
+            _codes[0] = abi.encode(lidoAndStETHAddress, _amounts[0], abi.encodeWithSignature("submit(address)", lidoReferralAddress));
         }
     }
 
@@ -193,9 +196,10 @@ contract LidoAdapter is IAdapter {
             _codes = new bytes[](2);
             // First, let's allow Curve to use our stETH 
             //TODO: Are there other parameters here? 
-            _codes[0] = abi.encode(lidoAndStETHAddress, abi.encodeWithSignature("approve(address,uint256)", curveETHStETHPool, _amount));
+            _codes[0] = abi.encode(lidoAndStETHAddress, 0, abi.encodeWithSignature("approve(address,uint256)", curveETHStETHPool, _amount));
             // Second, let's create the bytecode for actually exchanging stETH for ETH
             _codes[1] = abi.encode(curveETHStETHPool, 
+                0, // send 0 as msg.value
                 abi.encodeWithSignature("exchange(int128,int128,uint256,uint256)",
                 1, // index of sTETH in curve pool (what we want to exchange)
                 0, // "index" of ETH (it points to a burn address)
@@ -248,13 +252,10 @@ contract LidoAdapter is IAdapter {
     function getLiquidityPoolTokenBalance(
         address payable _vault,
         address,
-        address _liquidityPool
+        address
     ) public view override returns (uint256) {
-        // If _liquidityPool is the LdoAndStEth address, 
-        // This will get us the balance of ETH 
-        // There is an internal concept of "shares" but we choose 
-        // here not to break that abstraction barrier
-        return IERC20(_liquidityPool).balanceOf(_vault);
+        // This will return the number of shares owned by _vault
+        return IStETH(lidoAndStETHAddress).sharesOf(_vault);
     }
 
     /**
@@ -262,15 +263,10 @@ contract LidoAdapter is IAdapter {
      */
     function getSomeAmountInToken(
         address,
-        address _liquidityPool,
+        address,
         uint256 _liquidityPoolTokenAmount
     ) public view override returns (uint256) {
-        if (_liquidityPoolTokenAmount > 0) {
-            _liquidityPoolTokenAmount = _liquidityPoolTokenAmount
-                .mul(IHarvestDeposit(_liquidityPool).getPricePerFullShare())
-                .div(10**IHarvestDeposit(_liquidityPool).decimals());
-        }
-        return _liquidityPoolTokenAmount;
+        return IStETH(lidoAndStETHAddress).getPooledEthByShares(_liquidityPoolTokenAmount);
     }
 
     /**
