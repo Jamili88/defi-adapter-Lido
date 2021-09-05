@@ -12,21 +12,19 @@ pragma experimental ABIEncoderV2;
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 
 //  interfaces
-import { IHarvestDeposit } from "../interfaces/harvest.finance/IHarvestDeposit.sol";
-import { IHarvestFarm } from "../interfaces/harvest.finance/IHarvestFarm.sol";
+import { ILido } from "../interfaces/lido/ILido.sol";
+import { IStETH } from "../interfaces/lido/IStETH.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IAdapter } from "../interfaces/opty/defiAdapters/IAdapter.sol";
-import { IAdapterHarvestReward } from "../interfaces/opty/defiAdapters/IAdapterHarvestReward.sol";
-import { IAdapterStaking } from "../interfaces/opty/defiAdapters/IAdapterStaking.sol";
 import { IUniswapV2Router02 } from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 
 /**
- * @title Adapter for Harvest.finance protocol
- * @author Opty.fi
- * @dev Abstraction layer to harvest finance's pools
+ * @title Adapter for Lido protocol
+ * @author yodashiv
+ * @dev Abstraction layer to Lido staking pool
  */
 
-contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaking {
+contract LidoAdapter is IAdapter {
     using SafeMath for uint256;
 
     /** @notice Maps liquidityPool to staking vault */
@@ -72,9 +70,6 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
     /** @notice Harvest.finance's reward token address */
     address public constant rewardToken = address(0xa0246c9032bC3A600820415aE600c6388619A14D);
 
-    // Referral address for Lido Staking
-    address public lidoReferralAddress = address(0x862ac3F3F28ddC370d38E1F0219FF460Ea5d86A9);
-
     constructor() public {
         liquidityPoolToStakingVault[TBTC_SBTC_CRV_DEPOSIT_POOL] = TBTC_SBTC_CRV_STAKE_VAULT;
         liquidityPoolToStakingVault[THREE_CRV_DEPOSIT_POOL] = THREE_CRV_STAKE_VAULT;
@@ -93,15 +88,8 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
     }
 
     /**
-     * Set the referral address for Lido
-     * @param _newLidoReferralAddress new lido referral address
-     */
-    function setLidoReferalAddress(address _newLidoReferralAddress) public {
-        lidoReferralAddress = _newLidoReferralAddress;
-    }
-
-    /**
      * @inheritdoc IAdapter
+     * Only ETH can be deposited to the Lido staking pool, so _underlyingTokens is not used
      */
     function getDepositAllCodes(
         address payable _vault,
@@ -109,7 +97,8 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
         address _liquidityPool
     ) public view override returns (bytes[] memory _codes) {
         uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = IERC20(_underlyingTokens[0]).balanceOf(_vault);
+        // Full balance of the vault
+        _amounts[0] = _vault.balance;
         return getDepositSomeCodes(_vault, _underlyingTokens, _liquidityPool, _amounts);
     }
 
@@ -284,7 +273,7 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
      */
     function getDepositSomeCodes(
         address payable,
-        address[] memory _underlyingTokens,
+        address[] memory,
         address _liquidityPool,
         uint256[] memory _amounts
     ) public view override returns (bytes[] memory _codes) {
@@ -299,6 +288,9 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
                 abi.encodeWithSignature("approve(address,uint256)", _liquidityPool, _amounts[0])
             );
             _codes[2] = abi.encode(_liquidityPool, abi.encodeWithSignature("deposit(uint256)", _amounts[0]));
+
+            // The address argument is a optional referral address
+            abi.encode(_liquidityPool, abi.encodeWithSelector("submit(address)", address(0)));
         }
     }
 
