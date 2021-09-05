@@ -37,12 +37,26 @@ contract LidoAdapter is IAdapter {
      */
     address public constant uniswapV2Router02 = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
 
-    /** @notice Harvest.finance's reward token address */
-    address public constant rewardToken = address(0xa0246c9032bC3A600820415aE600c6388619A14D);
+    /**
+     * @notice Curve ETH/StETH pool  
+     * Curve provides the best liquidity for ETH/StETH (as they are very close in price)
+     * Liquidity is deeper also because of liquidity mining on Curve
+     * https://blog.lido.fi/providing-steth-liquidity-via-curve-to-receive-rewards/  
+     */
+     address public constant curveETHStETHPool = address(0xDC24316b9AE028F1497c275EB9192a3Ea0f67022);
 
-    // This is the address for the LIDO staking contract
-    // Note that this is a proxy contract 
+    /**
+     * @notice This is the address for the LIDO staking contract
+     * Note that this is a proxy contract 
+     * https://docs.lido.fi/deployed-contracts
+     */
     address payable public lidoAndStETHAddress = payable(0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84);
+
+    /**
+     * @notice This is the address for the LDO governance token
+     * This could serve as a reward token in the future
+     */
+    address public LdoGovernanceToken = address(0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32);
 
     // Referral address for Lido Staking
     address public lidoReferralAddress = address(0x862ac3F3F28ddC370d38E1F0219FF460Ea5d86A9);
@@ -248,9 +262,13 @@ contract LidoAdapter is IAdapter {
     }
 
     /**
+     * Note that there is no reward token for staking on Lido currently, 
+     * but the LDO governance token could serve as reward token in the future. 
+     * Thus, we put the address of the LDO token here. 
      * @inheritdoc IAdapter
      */
+     // DONE
     function getRewardToken(address) public view override returns (address) {
-        return rewardToken;
+        return LdoGovernanceToken;
     }
 }
