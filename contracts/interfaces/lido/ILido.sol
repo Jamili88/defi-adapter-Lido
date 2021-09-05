@@ -2,7 +2,7 @@
 
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.4.24;
+pragma solidity ^0.6.12;
 
 /**
  * @title Liquid staking pool
@@ -85,7 +85,7 @@ interface ILido {
     /**
      * @notice Returns current credentials to withdraw ETH on ETH 2.0 side after the phase 2 is launched
      */
-    function getWithdrawalCredentials() external view returns (bytes);
+    function getWithdrawalCredentials() external view returns (bytes calldata);
 
     event WithdrawalCredentialsSet(bytes32 withdrawalCredentials);
 
