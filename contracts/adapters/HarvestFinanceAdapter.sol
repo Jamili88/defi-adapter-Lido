@@ -72,9 +72,6 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
     /** @notice Harvest.finance's reward token address */
     address public constant rewardToken = address(0xa0246c9032bC3A600820415aE600c6388619A14D);
 
-    // Referral address for Lido Staking
-    address public lidoReferralAddress = address(0x862ac3F3F28ddC370d38E1F0219FF460Ea5d86A9);
-
     constructor() public {
         liquidityPoolToStakingVault[TBTC_SBTC_CRV_DEPOSIT_POOL] = TBTC_SBTC_CRV_STAKE_VAULT;
         liquidityPoolToStakingVault[THREE_CRV_DEPOSIT_POOL] = THREE_CRV_STAKE_VAULT;
@@ -90,14 +87,6 @@ contract HarvestFinanceAdapter is IAdapter, IAdapterHarvestReward, IAdapterStaki
         liquidityPoolToStakingVault[F_CDAI_CUSDC_DEPOSIT_POOL] = F_CDAI_CUSDC_STAKE_VAULT;
         liquidityPoolToStakingVault[F_USDN_THREE_CRV_DEPOSIT_POOL] = F_USDN_THREE_CRV_STAKE_VAULT;
         liquidityPoolToStakingVault[F_YDAI_YUSDC_YUSDT_YBUSD_DEPOSIT_POOL] = F_YDAI_YUSDC_YUSDT_YBUSD_STAKE_VAULT;
-    }
-
-    /**
-     * Set the referral address for Lido
-     * @param _newLidoReferralAddress new lido referral address
-     */
-    function setLidoReferalAddress(address _newLidoReferralAddress) public {
-        lidoReferralAddress = _newLidoReferralAddress;
     }
 
     /**

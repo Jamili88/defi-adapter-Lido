@@ -87,6 +87,17 @@ contract LidoAdapter is IAdapter {
         liquidityPoolToStakingVault[F_YDAI_YUSDC_YUSDT_YBUSD_DEPOSIT_POOL] = F_YDAI_YUSDC_YUSDT_YBUSD_STAKE_VAULT;
     }
 
+    // Referral address for Lido Staking
+    address public lidoReferralAddress = address(0x862ac3F3F28ddC370d38E1F0219FF460Ea5d86A9);
+
+    /**
+     * Set the referral address for Lido
+     * @param _newLidoReferralAddress new lido referral address
+     */
+    function setLidoReferalAddress(address _newLidoReferralAddress) public {
+        lidoReferralAddress = _newLidoReferralAddress;
+    }
+
     /**
      * @inheritdoc IAdapter
      * Only ETH can be deposited to the Lido staking pool, so _underlyingTokens is not used
