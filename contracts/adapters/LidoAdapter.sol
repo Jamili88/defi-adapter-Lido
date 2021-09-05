@@ -12,16 +12,9 @@ pragma experimental ABIEncoderV2;
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 
 //  interfaces
-import { ILido } from "../interfaces/lido/ILido.sol";
 import { IStETH } from "../interfaces/lido/IStETH.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IAdapter } from "../interfaces/opty/defiAdapters/IAdapter.sol";
-import { IUniswapV2Router02 } from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
-
-import { IHarvestDeposit } from "../interfaces/harvest.finance/IHarvestDeposit.sol";
-import { IHarvestFarm } from "../interfaces/harvest.finance/IHarvestFarm.sol";
-import { IAdapterHarvestReward } from "../interfaces/opty/defiAdapters/IAdapterHarvestReward.sol";
-import { IAdapterStaking } from "../interfaces/opty/defiAdapters/IAdapterStaking.sol";
 
 /**
  * @title Adapter for Lido protocol
@@ -184,8 +177,8 @@ contract LidoAdapter is IAdapter {
      */
     function getWithdrawSomeCodes(
         address payable,
-        address[] memory _underlyingTokens,
-        address _liquidityPool,
+        address[] memory,
+        address,
         uint256 _amount
     ) public view override returns (bytes[] memory _codes) {
         if (_amount > 0) {
@@ -216,7 +209,7 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-    function getPoolValue(address _liquidityPool, address) public view override returns (uint256) {
+    function getPoolValue(address, address) public view override returns (uint256) {
         return IERC20(lidoAndStETHAddress).totalSupply();
     }
 
