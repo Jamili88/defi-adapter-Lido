@@ -12,7 +12,7 @@ pragma experimental ABIEncoderV2;
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 
 //  interfaces
-import { IStETH } from "../interfaces/lido/IStETH.sol";
+import { ILido } from "../interfaces/lido/ILido.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IAdapter } from "../interfaces/opty/defiAdapters/IAdapter.sol";
 
@@ -118,7 +118,7 @@ contract LidoAdapter is IAdapter {
         address,
         uint256 _underlyingTokenAmount
     ) public view override returns (uint256) {
-        return IStETH(lidoAndStETHAddress).getSharesByPooledEth(_underlyingTokenAmount);
+        return ILido(lidoAndStETHAddress).getSharesByPooledEth(_underlyingTokenAmount);
     }
 
     /**
@@ -133,7 +133,7 @@ contract LidoAdapter is IAdapter {
         // There is no concept of redeemable LP tokens
         // Rewards are automatically added to a users balance (no need to redeem)
         // So let's just calculate the amount of ETH corresponds to _redeemAmount of shares
-        return IStETH(lidoAndStETHAddress).getPooledEthByShares(_redeemAmount);
+        return ILido(lidoAndStETHAddress).getPooledEthByShares(_redeemAmount);
     }
 
     /**
@@ -245,7 +245,7 @@ contract LidoAdapter is IAdapter {
         address
     ) public view override returns (uint256) {
         // This will return the number of shares owned by _vault
-        return IStETH(lidoAndStETHAddress).sharesOf(_vault);
+        return ILido(lidoAndStETHAddress).sharesOf(_vault);
     }
 
     /**
@@ -256,7 +256,7 @@ contract LidoAdapter is IAdapter {
         address,
         uint256 _liquidityPoolTokenAmount
     ) public view override returns (uint256) {
-        return IStETH(lidoAndStETHAddress).getPooledEthByShares(_liquidityPoolTokenAmount);
+        return ILido(lidoAndStETHAddress).getPooledEthByShares(_liquidityPoolTokenAmount);
     }
 
     /**

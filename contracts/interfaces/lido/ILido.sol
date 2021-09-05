@@ -4,6 +4,8 @@
 
 pragma solidity ^0.6.12;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 /**
  * @title Liquid staking pool
  *
@@ -13,11 +15,13 @@ pragma solidity ^0.6.12;
  * only a small portion (buffer) of it.
  * It also mints new tokens for rewards generated at the ETH 2.0 side.
  */
-interface ILido {
-    /**
-     * @dev From ISTETH interface, because "Interfaces cannot inherit".
-     */
-    function totalSupply() external view returns (uint256);
+interface ILido is IERC20 {
+
+    function getPooledEthByShares(uint256 _sharesAmount) external view returns (uint256);
+
+    function getSharesByPooledEth(uint256 _pooledEthAmount) external view returns (uint256);
+
+    function sharesOf(address _account) external view returns (uint256);
 
     function getTotalShares() external view returns (uint256);
 
