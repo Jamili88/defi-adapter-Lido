@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+/* solhint-disable no-empty-blocks */
 
 pragma solidity ^0.6.12;
 pragma experimental ABIEncoderV2;
@@ -228,4 +229,8 @@ contract TestDeFiAdapter is MultiCall {
     function getERC20TokenBalance(address _token, address _account) external view returns (uint256) {
         return ERC20(_token).balanceOf(_account);
     }
+
+    // We need to allow this vault to accept ETH (as that is the "underlying token")
+    receive() external payable {}
+    fallback() external payable {}
 }
