@@ -146,7 +146,6 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-     // DONE
     function isRedeemableAmountSufficient(
         address payable _vault,
         address _underlyingToken,
@@ -168,7 +167,6 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-     // DONE
     function getDepositSomeCodes(
         address payable,
         address[] memory,
@@ -184,8 +182,6 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-    // DONE
-    // _amount is the amount in pooled ETH (not shares)
     function getWithdrawSomeCodes(
         address payable,
         address[] memory _underlyingTokens,
@@ -195,20 +191,22 @@ contract LidoAdapter is IAdapter {
         if (_amount > 0) {
             _codes = new bytes[](2);
             // First, let's allow Curve to use our stETH 
-            //TODO: Are there other parameters here? 
             _codes[0] = abi.encode(lidoAndStETHAddress, 0, abi.encodeWithSignature("approve(address,uint256)", curveETHStETHPool, _amount));
             // Second, let's create the bytecode for actually exchanging stETH for ETH
             _codes[1] = abi.encode(curveETHStETHPool, 
                 0, // send 0 as msg.value
                 abi.encodeWithSignature("exchange(int128,int128,uint256,uint256)",
-                1, // index of sTETH in curve pool (what we want to exchange)
-                0, // "index" of ETH (it points to a burn address)
-                _amount, // the amount of stETH that we want to sell into the pool
-                _getMinAmountOfTokenAfterSwap(_amount) // specify max slippage
+                    1, // index of sTETH in curve pool (what we want to exchange)
+                    0, // "index" of ETH (it points to a burn address)
+                    _amount, // the amount of stETH that we want to sell into the pool
+                    _getMinAmountOfTokenAfterSwap(_amount) // specify max slippage
             ));
         }
     }
 
+    /**
+     * @param _amountToSell the amount of stETH to sell to Curve
+     */
     function _getMinAmountOfTokenAfterSwap(uint256 _amountToSell) public view returns(uint256) {
         // 1% max slippage
         uint256 maxSlippage = _amountToSell.mul(_maxSlippage).div(10000);
@@ -219,14 +217,14 @@ contract LidoAdapter is IAdapter {
      * @inheritdoc IAdapter
      */
     function getPoolValue(address _liquidityPool, address) public view override returns (uint256) {
-        return IHarvestDeposit(_liquidityPool).underlyingBalanceWithInvestment();
+        return IERC20(lidoAndStETHAddress).totalSupply();
     }
 
     /**
      * @inheritdoc IAdapter
      */
-    function getLiquidityPoolToken(address, address _liquidityPool) public view override returns (address) {
-        return _liquidityPool;
+    function getLiquidityPoolToken(address, address) public view override returns (address) {
+        return lidoAndStETHAddress;
     }
 
     /**
@@ -248,7 +246,6 @@ contract LidoAdapter is IAdapter {
     /**
      * @inheritdoc IAdapter
      */
-     // DONE
     function getLiquidityPoolTokenBalance(
         address payable _vault,
         address,
@@ -275,7 +272,6 @@ contract LidoAdapter is IAdapter {
      * Thus, we put the address of the LDO token here. 
      * @inheritdoc IAdapter
      */
-     // DONE
     function getRewardToken(address) public view override returns (address) {
         return LdoGovernanceToken;
     }
