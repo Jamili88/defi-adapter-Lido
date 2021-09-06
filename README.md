@@ -1,8 +1,12 @@
 <img src="https://avatars.githubusercontent.com/u/71294241?s=400&u=0b62a061c11a7536c27b1d53760152b5e9bd40f5&v=4" alt="Header" style="width:200px;align=center;float: right;" />
 
-## DeFi Adapter Kit
+## OpytFi-Lido Adapter
 
-Starter kit for defi adapter development compatible with Opty-Fi's earn-protocol
+This repository contains a DeFi adapter 
+that allows the OptyFi Yield Aggregator 
+Protocol to plug into the Lido Protocol and
+offer users exposure to the yield generated 
+by becoming a validator on the ETH 2.0 Beacon Chain. 
 
 ### Prerequisites
 
@@ -12,8 +16,6 @@ Starter kit for defi adapter development compatible with Opty-Fi's earn-protocol
 - Learn smart contract development environment like [Hardhat](https://hardhat.org/getting-started/)
 - Learn testing framework like [mocha](https://mochajs.org/)
 - Learn assertion library like [chai](https://www.chaijs.com/)
-
-And passion for financial freedom...
 
 ## Getting started
 
@@ -41,29 +43,6 @@ yarn install
   - [IAdapterBorrow.sol](./contracts/interfaces/opty/IAdapterBorrow.sol) **(Optional)**
   - [IAdapterInvestmentLimit.sol](./contracts/interfaces/opty/IAdapterInvestmentLimit.sol) **(Optional)**
 
-> Pro Tip : Inherit IAdapterFull interface from [IAdapterFull.sol](./contracts/interfaces/opty/IAdapterFull.sol) to Adapter Contract if the protocol you choose required implementation of all the above interfaces.
-
-### Developing DeFiAdapter
-
-#### Step #1 - Use this template
-
-- This is a GitHub template, so click on green button "Use this template" on the top-right corner of the page to create new defi adapter.
-
-#### Step #2 - Pool, LP token and underlying token(s) address gathering
-
-- Choose a DeFi protocol and gather the pool contract addresses similar to [harvest.finance-pools.json](./test/harvest.finance-pools.json).
-
-#### Step #3 - Implementing `IAdapter` interface
-
-- Implement an adapter contract using above interface(s) similar to [HarvestFinanceAdapter.sol](./contracts/adapters/HarvestFinanceAdapters.sol)
-
-#### Step #4 - Unit Tests
-
-- Write unit tests for all the functions across all the pool contracts gathered in Step 1.
-- You might want to use a test utility contract like [TestDeFiAdapter](./contracts/mock/TestDeFiAdapter.sol) for creating a sandbox environment to execute the transaction based on function signature and target address returned from `getCodes()`-style functions from DeFiAdapter.
-- All other functions can be directly tested from the DeFiAdapter contract.
-- The unit test for `HarvestFinanceAdapter.sol` can be found in [HarvestFinanceAdapter.ts](./test/adapters/HarvestFinanceAdapter.ts)
-
 #### Useful commands
 
 | Usage                                                                           | Command            |
@@ -76,21 +55,6 @@ yarn install
 | Generate the code coverage report                                               | `$ yarn coverage`  |
 | Delete the smart contract artifacts, the coverage reports and the Hardhat cache | `$ yarn clean`     |
 | Deploy the adapter to Hardhat Network                                           | `$ yarn deploy`    |
-
-#### Syntax Highlighting
-
-If you use VSCode, you can enjoy syntax highlighting for your Solidity code via the
-[vscode-solidity](https://github.com/juanfranblanco/vscode-solidity) extension. The recommended approach to set the
-compiler version is to add the following fields to your VSCode user settings:
-
-```json
-{
-  "solidity.compileUsingRemoteVersion": "v0.6.12+commit.27d51765",
-  "solidity.defaultCompiler": "remote"
-}
-```
-
-Where of course `v0.6.12+commit.27d51765` can be replaced with any other version.
 
 ### References
 
