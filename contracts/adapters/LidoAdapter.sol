@@ -26,11 +26,6 @@ contract LidoAdapter is IAdapter {
     using SafeMath for uint256;
 
     /**
-     * @notice Uniswap V2 router contract address
-     */
-    address public constant uniswapV2Router02 = address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
-
-    /**
      * @notice Curve ETH/StETH pool  
      * Curve provides the best liquidity for ETH/StETH (as they are very close in price)
      * Liquidity is deeper also because of liquidity mining on Curve
