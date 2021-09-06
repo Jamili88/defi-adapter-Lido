@@ -71,4 +71,14 @@ export function shouldBehaveLikeLidoAdapter(token: string, pool: PoolItem): void
     // We have max slippage of 1%, so let's make sure that we got enough ETH back from Curve
     expect(actualUnderlyingTokenBalanceAfterWithdraw).to.be.gt(expectedUnderlyingTokenBalanceAfterWithdraw.mul(99).div(100));
   });
+
+  it(`should return the LDO token address (possible future reward token) and indicate staking is not possible.`, async function () {
+        // The address argument does not actually matter
+        const ldoGovernanceToken = await this.lidoAdapter.getRewardToken("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+        expect(ldoGovernanceToken).to.be.eq("0x5A98FcBEA516Cf06857215779Fd812CA3beF1B32");
+
+        // Staking should not be possible
+        const isStakingAllowed = await this.lidoAdapter.canStake("0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+        expect(isStakingAllowed).to.be.eq(false);
+  });
 }
