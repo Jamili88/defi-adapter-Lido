@@ -174,6 +174,7 @@ contract LidoAdapter is IAdapter {
 
     /**
      * @inheritdoc IAdapter
+     * @param _amount is the amount in shares
      */
     function getWithdrawSomeCodes(
         address payable,
@@ -182,23 +183,25 @@ contract LidoAdapter is IAdapter {
         uint256 _amount
     ) public view override returns (bytes[] memory _codes) {
         if (_amount > 0) {
+            uint256 _amountInStETH = ILido(lidoAndStETHAddress).getPooledEthByShares(_amount);
             _codes = new bytes[](2);
             // First, let's allow Curve to use our stETH 
-            _codes[0] = abi.encode(lidoAndStETHAddress, 0, abi.encodeWithSignature("approve(address,uint256)", curveETHStETHPool, _amount));
+            _codes[0] = abi.encode(lidoAndStETHAddress, 0, abi.encodeWithSignature("approve(address,uint256)", curveETHStETHPool, _amountInStETH));
             // Second, let's create the bytecode for actually exchanging stETH for ETH
             _codes[1] = abi.encode(curveETHStETHPool, 
                 0, // send 0 as msg.value
                 abi.encodeWithSignature("exchange(int128,int128,uint256,uint256)",
                     1, // index of sTETH in curve pool (what we want to exchange)
                     0, // "index" of ETH (it points to a burn address)
-                    _amount, // the amount of stETH that we want to sell into the pool
-                    _getMinAmountOfTokenAfterSwap(_amount) // specify max slippage
+                    _amountInStETH, // the amount of stETH that we want to sell into the pool
+                    _getMinAmountOfTokenAfterSwap(_amountInStETH) // specify max slippage
             ));
         }
     }
 
     /**
      * @param _amountToSell the amount of stETH to sell to Curve
+     * Note that this assumes stETH & ETH are trading at a 1:1 ratio
      */
     function _getMinAmountOfTokenAfterSwap(uint256 _amountToSell) public view returns(uint256) {
         // 1% max slippage

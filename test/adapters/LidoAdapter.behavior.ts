@@ -62,12 +62,13 @@ export function shouldBehaveLikeLidoAdapter(token: string, pool: PoolItem): void
       this.testDeFiAdapter.address, // placeholder of type address
       pool.pool,
     );
+    const expectedLPTokenBalanceAfterWithdraw = await lidoContract.sharesOf(this.testDeFiAdapter.address);
     // We should've sold all of our stETH into the curve pool
-    expect(actualLPTokenBalanceAfterWithdraw).to.be.eq(0);
+    expect(actualLPTokenBalanceAfterWithdraw).to.be.eq(expectedLPTokenBalanceAfterWithdraw);
 
     // 2.2 assert whether underlying token balance is as expected or not after withdraw
     const actualUnderlyingTokenBalanceAfterWithdraw = await hre.ethers.provider.getBalance(this.testDeFiAdapter.address);
     // We have max slippage of 1%, so let's make sure that we got enough ETH back from Curve
-    expect(actualUnderlyingTokenBalanceAfterWithdraw).to.be.greaterThanOrEqual(expectedUnderlyingTokenBalanceAfterWithdraw.mul(0.99));
+    expect(actualUnderlyingTokenBalanceAfterWithdraw).to.be.gt(expectedUnderlyingTokenBalanceAfterWithdraw.mul(99).div(100));
   });
 }
