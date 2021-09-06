@@ -8,6 +8,9 @@ Protocol to plug into the Lido Protocol and
 offer users exposure to the yield generated 
 by becoming a validator on the ETH 2.0 Beacon Chain. 
 
+## Further Documentation & Reading
+Please see the "documentation" directory for more in-depth details documenting the smart contracts
+
 ### Prerequisites
 
 - Install [Node JS](https://nodejs.org/en/download/) >= v12.0.0
