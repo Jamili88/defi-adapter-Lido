@@ -8,6 +8,11 @@ Protocol to plug into the Lido Protocol and
 offer users exposure to the yield generated 
 by becoming a validator on the ETH 2.0 Beacon Chain. 
 
+## Deployment on Ropsten Test Network
+The contract was deployed on the ropsten test network at the following
+address: 0xa2c5aD145Dc5783335D95eAfB8f1C74D69f5c31d.
+Please see the contract on etherscan [here](https://ropsten.etherscan.io/address/0xa2c5aD145Dc5783335D95eAfB8f1C74D69f5c31d).
+
 ## Further Documentation & Reading
 Please see the "documentation" directory for more in-depth details documenting the smart contracts
 

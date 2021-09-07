@@ -34,6 +34,13 @@ if (!archiveMainnetNodeURL) {
   throw new Error("Please set your ARCHIVE_MAINNET_NODE_URL in a .env file");
 }
 
+const ropstenMainnetNodeURL: string | undefined = process.env.ARCHIVE_ROPSTEN_NODE_URL;
+if (!ropstenMainnetNodeURL) {
+  throw new Error("Please set your ARCHIVE_ROPSTEN_NODE_URL in a .env file");
+}
+
+const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY;
+
 ////////////////////////////////////////////////////////////
 /// HARDHAT NETWORK CONFIGURATION FOR THE FORKED MAINNET ///
 ////////////////////////////////////////////////////////////
@@ -57,6 +64,10 @@ const config: HardhatUserConfig = {
       chainId: chainIds.hardhat,
       hardfork: "london",
     },
+    ropsten: {
+      url: ropstenMainnetNodeURL,
+      accounts: [`0x${ROPSTEN_PRIVATE_KEY}`]
+    }
   },
   paths: {
     artifacts: "./artifacts",
