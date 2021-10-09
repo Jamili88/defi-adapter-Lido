@@ -8,9 +8,6 @@ Protocol to plug into the Lido Protocol and
 offer users exposure to the yield generated 
 by becoming a validator on the ETH 2.0 Beacon Chain. 
 
-## Submission Video
-The demo is [here](https://www.loom.com/share/7380f6e87e6f4465b80c1bd354c51fd1).
-
 ## Deployment on Ropsten Test Network
 The contract was deployed on the ropsten test network at the following
 address: 0xa2c5aD145Dc5783335D95eAfB8f1C74D69f5c31d.
@@ -71,4 +68,3 @@ yarn install
 
 - [Hardhat](https://hardhat.org/getting-started/)
 - [Ethereum Development Documentation](https://ethereum.org/en/developers/docs/)
-- [Harvest Finance Docs](https://harvest-finance.gitbook.io/harvest-finance/)
